@@ -1,4 +1,6 @@
-import jwt from 'jsonwebtoken'
+//NE ZABUD POMIENYAT NA ENV VARS POTOM PZH
+
+import jwt, { JwtPayload } from 'jsonwebtoken'
 import { db } from '../db/db'
 import { eq, and } from 'drizzle-orm';
 
@@ -8,8 +10,7 @@ const generateToken = (userId: number): string => {
     return jwt.sign({ id: userId }, SECRET_KEY, { expiresIn: '1d' });
 };
 
-//TUT CHEKNI TIPIZAZIYU returna
-const verifyToken = (token: string) => {
+const verifyToken = (token: string): string | jwt.JwtPayload | null => {
     try {
         return jwt.verify(token, SECRET_KEY);
     } catch (err) {
@@ -17,8 +18,7 @@ const verifyToken = (token: string) => {
     }
 };
 
-//TUT TOZHE
-async function authPhotographersController(login: string, password: string) {
+async function authPhotographersController(login: string, password: string): Promise<string | null> {
     const userInfo = await db.db.select()
         .from(db.photographers)
         .where(and(eq(db.photographers.login, login), eq(db.photographers.password, password)))
