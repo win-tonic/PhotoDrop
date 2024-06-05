@@ -1,3 +1,4 @@
+//maybe wrong controller and middleware logic, check if that correct
 import { Request, Response, NextFunction } from 'express';
 import { authPhotographersController } from '../controllers/authPhotographersController';
 
@@ -15,3 +16,6 @@ class AuthController{
         }
     }
 }
+
+const authController = new AuthController();
+export {authController};
