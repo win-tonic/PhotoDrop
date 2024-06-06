@@ -8,6 +8,7 @@
     "drizzle-orm": "^0.31.0",
     "express": "^4.19.2",
     "jsonwebtoken": "^9.0.2",
+    "package.json": "^2.0.1",
     "pg": "^8.11.5"
   },
   "devDependencies": {

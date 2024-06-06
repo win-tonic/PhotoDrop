@@ -1,5 +1,6 @@
 import { Router } from "express";
-import { authController } from "../middleware/temporarynameauth";
+import { authController } from "../controllers/authController";
+import { albumController} from "../controllers/albumController"
 
 const router = Router();
 
