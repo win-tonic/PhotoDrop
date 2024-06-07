@@ -1,2 +1,3 @@
 add middleware token check
+add middleware error handling
 typify returns

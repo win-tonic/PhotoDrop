@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { verifyToken } from '../middleware/authMiddleware'
 import { insertNewAlbum, albumInfo, albumPhotos } from '../db/dbInteractions/dbAlbum';
 
 class AlbumController {
@@ -18,13 +17,13 @@ class AlbumController {
 
     public async getInfo(req: Request, res: Response) {
         const id = parseInt(req.query.id as string, 10)
-        const info = albumInfo(id)
+        const info = await albumInfo(id)
         res.json(info)
     }
 
     public async getPhotos(req: Request, res: Response) {
         const id = parseInt(req.query.id as string, 10)
-        const info = albumPhotos(id)
+        const info = await albumPhotos(id)
         res.json(info)
     }
 }

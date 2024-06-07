@@ -7,9 +7,12 @@ export async function insertNewAlbum(name: string, location: string, datapicker:
 
 //TYPIFY!!!
 export async function albumInfo(id: number): Promise<any> {
-    await db.db.select().from(db.albums).where(eq(db.albums.id, id)).execute();
+    const result = await db.db.select().from(db.albums).where(eq(db.albums.id, id));
+    return result;
+
 }
 //TYPIFY!!!
 export async function albumPhotos(id: number): Promise<any> {
-    await db.db.select().from(db.photos).where(eq(db.photos.albumId, id)).execute();
+    const result = await db.db.select().from(db.photos).where(eq(db.photos.albumId, id));
+    return result;
 }
