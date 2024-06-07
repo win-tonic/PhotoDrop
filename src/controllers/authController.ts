@@ -3,19 +3,25 @@
 
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { checkPhotographersCreds, getPhotogrpherInfo } from '../db/dbInteractions/dbAuth';
+import { checkPhotographersCreds, getPhotographerInfo } from '../db/dbInteractions/dbAuth';
 
 const SECRET_KEY_PHOTOGRAPHERS = 'secretkeyforphotographerslol';
 
 class AuthController {
-    private generatePhotographerLoginToken(login: string): string {
-        let userInfo = getPhotogrpherInfo(login)
+    constructor() {
+        this.loginPhotographer = this.loginPhotographer.bind(this);
+        this.authenticatePhotographer = this.authenticatePhotographer.bind(this);
+        this.generatePhotographerLoginToken = this.generatePhotographerLoginToken.bind(this);
+    }
+
+    private async generatePhotographerLoginToken(login: string): Promise<string> {
+        const userInfo = await getPhotographerInfo(login);
         return jwt.sign(userInfo, SECRET_KEY_PHOTOGRAPHERS, { expiresIn: '1d' });
     }
 
     private async authenticatePhotographer(login: string, password: string): Promise<string | undefined> {
-        const rightCreds = await checkPhotographersCreds(login, password)
-        return rightCreds ? this.generatePhotographerLoginToken(login) : undefined
+        const rightCreds = await checkPhotographersCreds(login, password);
+        return rightCreds ? this.generatePhotographerLoginToken(login) : undefined;
     }
 
     public async loginPhotographer(req: Request, res: Response) {
@@ -32,3 +38,11 @@ class AuthController {
 
 const authController = new AuthController();
 export { authController };
+
+// // function test() {
+// async function test() {
+//     let a = await 
+//     console.log(a)
+// }
+
+// test()
