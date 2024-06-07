@@ -1,5 +1,6 @@
 import { drizzle } from "drizzle-orm/node-postgres";
 import { pgTable } from "drizzle-orm/pg-core";
+import { type InferSelectModel } from 'drizzle-orm';
 import { Pool } from "pg";
 import { photographers, albums, photos } from "./schema";
 import dotenv from "dotenv";
@@ -23,4 +24,9 @@ class DB {
   }
 }
 
+type PhotographerType = InferSelectModel<typeof photographers>;
+type AlbumType = InferSelectModel<typeof albums>;
+type PhotoType = InferSelectModel<typeof photos>;
+
 export const db = new DB();
+export type { PhotographerType, AlbumType, PhotoType };

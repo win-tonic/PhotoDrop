@@ -1,5 +1,11 @@
-import { db } from "../db";
+import { db, PhotographerType } from "../db";
 import { eq, and } from 'drizzle-orm';
+
+interface photographerInfo {
+    id: number,
+    login: string,
+    fullname: string
+}
 
 export async function checkPhotographersCreds(login: string, password: string): Promise<0 | 1> {
     const userInfo = await db.db.select()
@@ -11,8 +17,7 @@ export async function checkPhotographersCreds(login: string, password: string): 
     return 0;
 }
 
-//TYPIFY OUTPUT WITH INTERFACE
-export async function getPhotographerInfo(login: string): Promise<any> {
+export async function getPhotographerInfo(login: string): Promise<photographerInfo> {
     const userInfo = await db.db.select({ id: db.photographers.id, login: db.photographers.login, fullname: db.photographers.fullname })
         .from(db.photographers)
         .where(eq(db.photographers.login, login));
