@@ -5,7 +5,7 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { checkPhotographersCreds, getPhotographerInfo } from '../db/dbInteractions/dbAuth';
 
-const SECRET_KEY_PHOTOGRAPHERS = 'secretkeyforphotographerslol';
+const SECRET_KEY_PHOTOGRAPHERS = process.env.PHOTOGRAPHERS_SECRET_KEY as string;
 
 class AuthController {
     constructor() {
