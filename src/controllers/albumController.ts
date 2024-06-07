@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { verifyToken } from '../middleware/Auth'
+import { verifyToken } from '../middleware/authMiddleware'
 import { insertNewAlbum, albumInfo, albumPhotos } from '../db/dbInteractions/dbAlbum';
 
 class AlbumController {
@@ -7,8 +7,7 @@ class AlbumController {
         const name = req.query.name as string;
         const location = req.query.location as string;
         const datapicker = req.query.datapicker as string;
-        const photographerInfo = verifyToken(req.headers.token as string)
-        const photographerId = (photographerInfo != undefined && typeof photographerInfo != "string") ? photographerInfo.id : undefined
+        const photographerId = res.locals.tokenInfo.id
         if (!name || !location || !datapicker || !photographerId) {
             res.status(400).send('Missing required information');
             return;

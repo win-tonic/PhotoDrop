@@ -25,4 +25,21 @@ const authenticate = (req: Request, res: Response, next: NextFunction) => {
     next();
 };
 
-export {verifyToken, authenticate}
+const needsToken = (controller: (req: Request, res: Response) => void) => {
+    return (req: Request, res: Response) => {
+        const token = req.headers.authorization?.split(' ')[1];
+        if (!token) {
+            return res.status(401).json({ status: 401, message: 'No token provided' });
+        }
+        const decoded = verifyToken(token);
+        if (!decoded) {
+            return res.status(401).json({ status: 401, message: 'Invalid token' });
+        }
+        res.locals = {...res.locals, tokenInfo: decoded}
+        controller(req, res);
+    };
+};
+
+
+
+export {verifyToken, authenticate, needsToken}

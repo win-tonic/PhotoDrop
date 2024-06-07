@@ -13,7 +13,7 @@ export async function checkPhotographersCreds(login: string, password: string): 
 
 //TYPIFY OUTPUT WITH INTERFACE
 export async function getPhotographerInfo(login: string): Promise<any> {
-    const userInfo = await db.db.select()
+    const userInfo = await db.db.select({ id: db.photographers.id, login: db.photographers.login, fullname: db.photographers.fullname })
         .from(db.photographers)
         .where(eq(db.photographers.login, login));
     return userInfo[0];

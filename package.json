@@ -11,7 +11,8 @@
     "jsonwebtoken": "^9.0.2",
     "multer": "1.4.5-lts.1",
     "package.json": "^2.0.1",
-    "pg": "^8.11.5"
+    "pg": "^8.11.5",
+    "pnpm": "^9.2.0"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
