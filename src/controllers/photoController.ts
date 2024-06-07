@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { uploadFile } from '../services/s3service';
-import { insertNewPhoto } from '../db/dbInteractions/dbPhoto';
+import { insertNewPhoto, addClientsToPhoto } from '../db/dbInteractions/dbPhoto';
 import multer from 'multer';
 
 const upload = multer();
@@ -33,6 +33,13 @@ class PhotoController {
             console.error(error);
             res.status(500).json({ status: 500, message: 'An error occurred while uploading files' });
         }
+    }
+
+    public async addClients(req: Request, res: Response){
+        const photoId = parseInt(req.query.photoId as string, 10);
+        const newClients = JSON.parse(req.query.clientsArray as string)
+        await addClientsToPhoto(photoId, newClients)
+        res.status(200).json({ status: 200, message: 'Clients added successfully' })
     }
 }
 

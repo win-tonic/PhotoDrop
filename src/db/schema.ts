@@ -20,6 +20,6 @@ export const photos = pgTable("photos", {
   id: serial("id").primaryKey(),
   albumId: integer("albumId").notNull(),
   url: varchar("url", { length: 1000 }).notNull(),
-  clients: varchar("clients", { length: 1000 })
+  clients: varchar("clients", { length: 1000 }).default('[]')
 })
 

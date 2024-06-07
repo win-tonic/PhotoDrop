@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { verifyToken } from '../middleware/Auth'
-import { insertNewAlbum } from '../db/dbInteractions/dbAlbum';
+import { insertNewAlbum, albumInfo, albumPhotos } from '../db/dbInteractions/dbAlbum';
 
 class AlbumController {
     public async createAlbum(req: Request, res: Response) {
@@ -15,6 +15,18 @@ class AlbumController {
         }
         await insertNewAlbum(name, location, datapicker, photographerId);
         res.status(200).send('Album created');
+    }
+
+    public async getInfo(req: Request, res: Response) {
+        const id = parseInt(req.query.id as string, 10)
+        const info = albumInfo(id)
+        res.json(info)
+    }
+
+    public async getPhotos(req: Request, res: Response) {
+        const id = parseInt(req.query.id as string, 10)
+        const info = albumPhotos(id)
+        res.json(info)
     }
 }
 
