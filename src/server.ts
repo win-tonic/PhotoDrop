@@ -17,16 +17,6 @@ app.use(router);
 
 bot.on('polling_error', (error) => console.log(error));
 
-app.listen(port, () => {
-    setInterval(() => {
-        const used = process.memoryUsage();
-        console.log(`Memory usage:
-          RSS=${(used.rss / 1024 / 1024).toFixed(2)}MB,
-          HeapTotal=${(used.heapTotal / 1024 / 1024).toFixed(2)}MB,
-          HeapUsed=${(used.heapUsed / 1024 / 1024).toFixed(2)}MB,
-          External=${(used.external / 1024 / 1024).toFixed(2)}MB,
-          ArrayBuffers=${(used.arrayBuffers / 1024 / 1024).toFixed(2)}MB`);
-      }, 10000);
-      
+app.listen(port, () => {  
     console.log(`Server is running on http://localhost:${port}/`);
 });
