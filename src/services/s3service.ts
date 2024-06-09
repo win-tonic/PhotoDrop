@@ -9,10 +9,10 @@ const s3 = new AWS.S3({
     region: 'eu-central-1'
 });
 
-const uploadFile = async (file: Express.Multer.File): Promise<AWS.S3.ManagedUpload.SendData> => {
+const uploadFile = async (file: Express.Multer.File, folderName: string): Promise<AWS.S3.ManagedUpload.SendData> => {
     const params = {
         Bucket: process.env.BUCKET_NAME as string,
-        Key: `photos/${Date.now()}_${file.originalname}`,
+        Key: `${folderName}/${Date.now()}_${file.originalname}`,
         Body: file.buffer,
         ContentType: file.mimetype
     };

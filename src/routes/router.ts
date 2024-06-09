@@ -1,19 +1,31 @@
 import { Router } from "express";
-import { needsToken } from "../middleware/authMiddleware";
-import { authController } from "../controllers/authController";
+import { needsPhotographerToken, needsClientToken } from "../middleware/authMiddleware";
+import { photographerAuthController } from "../controllers/photographerAuthController";
+import { clientAuthController } from "../controllers/clientAuthController"
 import { albumController} from "../controllers/albumController";
 import { photoController, upload } from '../controllers/photoController';
+import {clientController} from "../controllers/clientController";
 
 const router = Router();
 
-router.post('/loginPhotographer', authController.loginPhotographer);
+router.post('/loginPhotographer', photographerAuthController.loginPhotographer);
 
-router.post('/createAlbum', needsToken(albumController.createAlbum));
-router.get('/getPhotographerAlbums', needsToken(albumController.getAlbums));
-router.get('/getAlbumInfo', needsToken(albumController.getInfo));
-router.get('/getAlbumPhotos', needsToken(albumController.getPhotos));
+router.post('/getOtp', clientAuthController.sendOtp);
+router.get('/checkOtp', clientAuthController.checkOtp);
 
-router.post('/uploadPhotos', upload.array('photos', 10), needsToken(photoController.uploadPhotos));
-router.post('/addClients', needsToken(photoController.addClients))
+router.get('/getClientInfo', needsClientToken(clientController.getInfo));
+router.post('/changeName', needsClientToken(clientController.changeName));
+router.get('/getClientAlbums', needsClientToken(clientController.getAlbums));
+router.get('/getClientPhotos', needsClientToken(clientController.getPhotos));
+router.get('/getClientDashboard', needsClientToken(clientController.getDashboard));
+
+router.post('/createAlbum', needsPhotographerToken(albumController.createAlbum));
+router.get('/getPhotographerAlbums', needsPhotographerToken(albumController.getAlbums));
+router.get('/getAlbumInfo', needsPhotographerToken(albumController.getInfo));
+router.get('/getAlbumPhotos', needsPhotographerToken(albumController.getPhotos));
+
+router.post('/uploadPhotos', upload.array('photos', 10), needsPhotographerToken(photoController.uploadPhotographerPhotos));
+router.post('/uploadSelfies', upload.array('selfies', 10), needsClientToken(photoController.uploadSelfies));
+router.post('/addClients', needsPhotographerToken(photoController.addClients))
 
 export { router };

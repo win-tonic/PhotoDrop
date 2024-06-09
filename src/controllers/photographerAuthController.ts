@@ -3,11 +3,13 @@
 
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { checkPhotographersCreds, getPhotographerInfo } from '../db/dbInteractions/dbAuth';
+import { checkPhotographersCreds, getPhotographerInfo } from '../db/dbInteractions/dbPhotographerAuth';
+import dotenv from "dotenv";
+dotenv.config();
 
 const SECRET_KEY_PHOTOGRAPHERS = process.env.PHOTOGRAPHERS_SECRET_KEY as string;
 
-class AuthController {
+class PhtotographerAuthController {
     constructor() {
         this.loginPhotographer = this.loginPhotographer.bind(this);
         this.authenticatePhotographer = this.authenticatePhotographer.bind(this);
@@ -21,7 +23,8 @@ class AuthController {
 
     private async authenticatePhotographer(login: string, password: string): Promise<string | undefined> {
         const rightCreds = await checkPhotographersCreds(login, password);
-        return rightCreds ? this.generatePhotographerLoginToken(login) : undefined;
+        let token = rightCreds ? await this.generatePhotographerLoginToken(login) : undefined;
+        return token;
     }
 
     public async loginPhotographer(req: Request, res: Response) {
@@ -36,8 +39,8 @@ class AuthController {
     }
 }
 
-const authController = new AuthController();
-export { authController };
+const photographerAuthController = new PhtotographerAuthController();
+export { photographerAuthController };
 
 // // function test() {
 // async function test() {

@@ -1,4 +1,4 @@
-import { pgTable, serial, varchar, integer } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, integer, timestamp, smallint } from "drizzle-orm/pg-core";
 
 export const photographers = pgTable("photographers", {
   id: serial("id").primaryKey(),
@@ -13,13 +13,33 @@ export const albums = pgTable("albums", {
   photographerId: integer("photographerId").notNull(),
   name: varchar("name", { length: 1000 }).notNull(),
   location: varchar("location", { length: 1000 }).notNull(),
-  datapicker: varchar("datapicker", { length: 1000 }).notNull(),
+  datapicker: varchar("datapicker", { length: 1000 }).default('[]'),
+  paid: smallint("paid").default(0).notNull()
 })
 
 export const photos = pgTable("photos", {
   id: serial("id").primaryKey(),
   albumId: integer("albumId").notNull(),
   url: varchar("url", { length: 1000 }).notNull(),
-  clients: varchar("clients", { length: 1000 }).default('[]')
+  clients: varchar("clients", { length: 1000 }).default('[]').notNull(),
+  paid: smallint("paid").default(0).notNull()
 })
 
+export const otps = pgTable("otps", {
+  phoneNumber: varchar("phoneNumber", { length: 15 }).notNull().unique(),
+  otp: varchar("otp", { length: 6 }).default('').notNull(),
+  tryN: integer("tryN").default(0).notNull(),
+  timeSent: timestamp("timeSent").notNull()
+});
+
+export const clients = pgTable("clients", {
+  id: serial("id").primaryKey(),
+  phoneNumber: varchar("phoneNumber", { length: 15 }).notNull().unique(),
+  name: varchar("name", { length: 1000 })
+})
+
+export const selfies = pgTable("selfies", {
+  id: serial("id").primaryKey(),
+  phoneNumber: varchar("phoneNumber", { length: 15 }).notNull(),
+  url: varchar("url", { length: 1000 }).notNull()
+})
