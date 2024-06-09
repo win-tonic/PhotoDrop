@@ -9,6 +9,7 @@ const router = Router();
 router.post('/loginPhotographer', authController.loginPhotographer);
 
 router.post('/createAlbum', needsToken(albumController.createAlbum));
+router.get('/getPhotographerAlbums', needsToken(albumController.getAlbums));
 router.get('/getAlbumInfo', needsToken(albumController.getInfo));
 router.get('/getAlbumPhotos', needsToken(albumController.getPhotos));
 

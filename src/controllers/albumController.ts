@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { insertNewAlbum, albumInfo, albumPhotos } from '../db/dbInteractions/dbAlbum';
+import { insertNewAlbum, albumInfo, albumPhotos, photographerAlbums } from '../db/dbInteractions/dbAlbum';
 
 class AlbumController {
     public async createAlbum(req: Request, res: Response) {
@@ -25,6 +25,12 @@ class AlbumController {
         const id = parseInt(req.query.id as string, 10)
         const info = await albumPhotos(id)
         res.json(info)
+    }
+
+    public async getAlbums(req: Request, res: Response) {
+        const photographerId = res.locals.tokenInfo.id
+        const albums = await photographerAlbums(photographerId)
+        res.json(albums)
     }
 }
 

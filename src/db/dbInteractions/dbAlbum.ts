@@ -17,7 +17,6 @@ export async function albumInfo(id: number): Promise<AlbumType[]> {
         datapicker: db.albums.datapicker
     }).from(db.albums).where(eq(db.albums.id, id));
     return result;
-
 }
 
 export async function albumPhotos(id: number): Promise<PhotoType[]> {
@@ -27,5 +26,16 @@ export async function albumPhotos(id: number): Promise<PhotoType[]> {
         url: db.photos.url,
         clients: db.photos.clients
     }).from(db.photos).where(eq(db.photos.albumId, id));
+    return result;
+}
+
+export async function photographerAlbums(photographerId: number): Promise<AlbumType[]> {
+    const result = await db.db.select({
+        id: db.albums.id,
+        photographerId: db.albums.photographerId,
+        name: db.albums.name,
+        location: db.albums.location,
+        datapicker: db.albums.datapicker
+    }).from(db.albums).where(eq(db.albums.photographerId, photographerId));
     return result;
 }
