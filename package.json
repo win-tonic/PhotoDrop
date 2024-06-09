@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "generate-migration": "drizzle-kit generate:pg --config=./src/db/"
+    "generate-migration": "drizzle-kit generate:pg --config=./src/db/",
+    "start": "tsc && node dist/server.js"
   },
   "dependencies": {
     "aws-sdk": "^2.1636.0",
