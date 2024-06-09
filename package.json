@@ -1,7 +1,7 @@
 {
   "scripts": {
     "generate-migration": "drizzle-kit generate:pg --config=./src/db/",
-    "build": "tsc",
+    "build": "npm install && tsc",
     "start": "node dist/server.js"
   },
   "dependencies": {
