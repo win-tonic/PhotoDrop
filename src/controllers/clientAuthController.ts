@@ -52,7 +52,8 @@ class ClientAuthController {
             res.status(401).json({ status: 401, message: 'Invalid OTP' });
         } else if (otpRecord[0].tryN > 2) {
             res.status(401).json({ status: 401, message: 'Too many attempts' });
-        } else if (new Date().getTime() - otpRecord[0].timeSent.getTime() > 600000) {
+        } else if (new Date().getTime() - otpRecord[0].timeSent.getTime() > 180000) {
+            console.log()
             res.status(401).json({ status: 401, message: 'OTP expired' });
         } else {
             await clearOtpRecord(phoneNumber);
@@ -64,3 +65,14 @@ class ClientAuthController {
 
 const clientAuthController = new ClientAuthController();
 export { clientAuthController };
+
+// async function test() {
+//     const otpRecord = await getOtpRecord('44444');
+//     const dbTime = otpRecord[0].timeSent;
+//     console.log(dbTime);
+//     console.log(new Date())
+//     console.log(new Date().getTime() - otpRecord[0].timeSent.getTime())
+//     console.log(new Date().getTime() - otpRecord[0].timeSent.getTime() > 180000)
+// }
+
+// test()
