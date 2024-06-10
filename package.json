@@ -15,7 +15,9 @@
     "node-telegram-bot-api": "^0.66.0",
     "package.json": "^2.0.1",
     "pg": "^8.11.5",
-    "pnpm": "^9.2.0"
+    "pnpm": "^9.2.0",
+    "sharp": "^0.33.4",
+    "sharp-watermark": "^0.5.3"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

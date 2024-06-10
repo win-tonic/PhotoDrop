@@ -1,3 +1,4 @@
+import { unwatermarkPhotos } from '../../utilities/utilities';
 import { db, ClientType, AlbumType, PhotoType, SelfieType} from '../db';
 import { eq, and, like } from 'drizzle-orm';
 
@@ -25,8 +26,9 @@ export async function getClientAlbums(phoneNumber: string): Promise<AlbumType[]>
 }
 
 export async function getClientPhotos(phoneNumber: string, albumId: number): Promise<PhotoType[]> {
+    let result: PhotoType[];
     if (!albumId) {
-        return await db.db.select({
+        result = await db.db.select({
             id: db.photos.id,
             albumId: db.photos.albumId,
             url: db.photos.url,
@@ -34,7 +36,7 @@ export async function getClientPhotos(phoneNumber: string, albumId: number): Pro
             paid: db.photos.paid
         }).from(db.photos).where(like(db.photos.clients, `%${phoneNumber}%`));
     } else {
-        return await db.db.select({
+        result = await db.db.select({
             id: db.photos.id,
             albumId: db.photos.albumId,
             url: db.photos.url,
@@ -42,13 +44,15 @@ export async function getClientPhotos(phoneNumber: string, albumId: number): Pro
             paid: db.photos.paid
         }).from(db.photos).where(and(eq(db.photos.albumId, albumId), like(db.photos.clients, `%${phoneNumber}%`)));
     }
+    return unwatermarkPhotos(result, 'paidOnly');
 }
 
 export async function getClientSelfies(phoneNumber: string): Promise<SelfieType[]> {
     return await db.db.select({
         id: db.selfies.id,
         phoneNumber: db.selfies.phoneNumber,
-        url: db.selfies.url
-    }).from(db.selfies).where(eq(db.selfies.phoneNumber, phoneNumber));
+        url: db.selfies.url,
+        isDeleted: db.selfies.isDeleted
+    }).from(db.selfies).where(and(eq(db.selfies.phoneNumber, phoneNumber), eq(db.selfies.isDeleted, 0)));
 }
 

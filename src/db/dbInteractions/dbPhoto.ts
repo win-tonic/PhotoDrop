@@ -23,8 +23,9 @@ export async function addClientsToPhoto(photoId: number, newClients: string[]): 
     await db.db.update(db.photos).set({clients: JSON.stringify(resultingClients)}).where(eq(db.photos.id, photoId));
 }
 
-export async function insertNewSelfie(clientId: number, url: string): Promise<void> {
-    await db.db.insert(db.selfies).values({ clientId, url });
+export async function insertNewSelfie(phoneNumber: string, url: string): Promise<void> {
+    await db.db.update(db.selfies).set({isDeleted: 1}).where(eq(db.selfies.phoneNumber, phoneNumber));
+    await db.db.insert(db.selfies).values({ phoneNumber, url });
 }
 
 export async function labelPhotosAsPaid(photoIds: number[]): Promise<void> {

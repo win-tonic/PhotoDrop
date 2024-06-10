@@ -1,3 +1,4 @@
+import { is } from "drizzle-orm";
 import { pgTable, serial, varchar, integer, timestamp, smallint } from "drizzle-orm/pg-core";
 
 export const photographers = pgTable("photographers", {
@@ -41,5 +42,6 @@ export const clients = pgTable("clients", {
 export const selfies = pgTable("selfies", {
   id: serial("id").primaryKey(),
   phoneNumber: varchar("phoneNumber", { length: 15 }).notNull(),
-  url: varchar("url", { length: 1000 }).notNull()
+  url: varchar("url", { length: 1000 }).notNull(),
+  isDeleted: smallint("isDeleted").default(0).notNull()
 })

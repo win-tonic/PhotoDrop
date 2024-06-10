@@ -1,5 +1,6 @@
 import { db, AlbumType, PhotoType} from "../db";
 import { eq } from 'drizzle-orm';
+import { unwatermarkPhotos } from "../../utilities/utilities";
 
 
 export async function insertNewAlbum(name: string, location: string, datapicker: string, photographerId: number): Promise<void> {
@@ -39,7 +40,7 @@ export async function albumPhotos(albumId: number): Promise<PhotoType[]> {
         clients: db.photos.clients,
         paid: db.photos.paid
     }).from(db.photos).where(eq(db.photos.albumId, albumId));
-    return result;
+    return unwatermarkPhotos(result, 'force');
 }
 
 export async function labelAlbumAsPaid(albumId: number): Promise<void> {

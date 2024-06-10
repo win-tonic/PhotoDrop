@@ -27,9 +27,10 @@ class PhtotographerAuthController {
         return token;
     }
 
+    //body v poste
     public async loginPhotographer(req: Request, res: Response) {
-        const login = req.query.login as string;
-        const password = req.query.password as string;
+        const login = req.body.login as string;
+        const password = req.body.password as string;
         const token = await this.authenticatePhotographer(login, password);
         if (token) {
             res.status(200).json({ token });

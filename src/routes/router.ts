@@ -20,7 +20,9 @@ router.get('/getClientPhotos', needsClientToken(clientController.getPhotos));
 router.get('/getClientDashboard', needsClientToken(clientController.getDashboard));
 
 router.post('/createAlbum', needsPhotographerToken(albumController.createAlbum));
+//albumName, albumLocation, albumDate, 1 photo, albumId
 router.get('/getPhotographerAlbums', needsPhotographerToken(albumController.getAlbums));
+//add photos
 router.get('/getAlbumInfo', needsPhotographerToken(albumController.getInfo));
 router.get('/getAlbumPhotos', needsPhotographerToken(albumController.getPhotos));
 

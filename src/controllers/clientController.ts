@@ -17,7 +17,7 @@ class ClientController {
 
     public async changeName(req: Request, res: Response) {
         const phoneNumber = res.locals.tokenInfo.phoneNumber;
-        const name = req.query.name as string;
+        const name = req.body.name as string;
         await changeName(phoneNumber, name);
         res.status(200).json({ status: 200, message: 'Name changed successfully' });
     }
