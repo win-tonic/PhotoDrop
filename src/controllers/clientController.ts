@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { changeName, getClientInfo, getClientAlbums, getClientPhotos, getClientSelfies } from '../db/dbInteractions/dbClient';
+import { changeName, getClientInfo, getClientAlbums, getClientPhotos, getClientSelfie } from '../db/dbInteractions/dbClient';
 
 class ClientController {
     constructor() {
@@ -12,7 +12,8 @@ class ClientController {
     public async getInfo(req: Request, res: Response) {
         const phoneNumber = res.locals.tokenInfo.phoneNumber;
         const info = await getClientInfo(phoneNumber);
-        res.status(200).json({ status: 200, info });
+        const selfie = await getClientSelfie(phoneNumber);
+        res.status(200).json({ status: 200, info, selfie });
     }
 
     public async changeName(req: Request, res: Response) {
@@ -40,12 +41,6 @@ class ClientController {
         const albums = await getClientAlbums(phoneNumber);
         let photos = await getClientPhotos(phoneNumber, 0);
         res.status(200).json({ status: 200, albums, photos });
-    }
-
-    public async getSelfies(req: Request, res: Response) {
-        const phoneNumber = res.locals.tokenInfo.phoneNumber;
-        const selfies = await getClientSelfies(phoneNumber);
-        res.status(200).json({ status: 200, selfies });
     }
 }
 

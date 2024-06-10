@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { insertNewAlbum, albumInfo, photographerAlbums, albumPhotos, labelAlbumAsPaid } from '../db/dbInteractions/dbAlbum';
+import { insertNewAlbum, getAlbum, photographerAlbums, albumPhotos, labelAlbumAsPaid } from '../db/dbInteractions/dbAlbum';
 
 class AlbumController {
     public async createAlbum(req: Request, res: Response) {
@@ -17,7 +17,7 @@ class AlbumController {
 
     public async getInfo(req: Request, res: Response) {
         const id = parseInt(req.query.id as string, 10)
-        const info = await albumInfo(id)
+        const info = await getAlbum(id)
         res.json(info)
     }
 

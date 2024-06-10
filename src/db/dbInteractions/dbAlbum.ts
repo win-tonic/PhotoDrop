@@ -1,6 +1,7 @@
-import { db, AlbumType, PhotoType} from "../db";
-import { eq } from 'drizzle-orm';
+import { db, AlbumType, PhotoType } from "../db";
+import { eq, inArray, max } from 'drizzle-orm';
 import { unwatermarkPhotos } from "../../utilities/utilities";
+import { getPhotosInfo } from './dbPhoto';
 
 
 export async function insertNewAlbum(name: string, location: string, datapicker: string, photographerId: number): Promise<void> {
@@ -20,7 +21,7 @@ export async function albumInfo(id: number): Promise<AlbumType[]> {
     return result;
 }
 
-export async function photographerAlbums(photographerId: number): Promise<AlbumType[]> {
+export async function photographerAlbumsInfo(photographerId: number): Promise<AlbumType[]> {
     const result = await db.db.select({
         id: db.albums.id,
         photographerId: db.albums.photographerId,
@@ -32,6 +33,27 @@ export async function photographerAlbums(photographerId: number): Promise<AlbumT
     return result;
 }
 
+export async function photographerAlbums(photographerId: number): Promise<(AlbumType & { topPhoto?: PhotoType })[]> {
+    const info = await photographerAlbumsInfo(photographerId);
+    const albumIds = info.map(album => album.id);
+    const topPhotoIds = db.db.$with('topPhotoIds').as(db.db.select({
+        maxId: max(db.photos.id).as('maxId')
+    }).from(db.photos).where(inArray(db.photos.albumId, albumIds)).groupBy(db.photos.albumId))
+    const topPhotos = await db.db.with(topPhotoIds).select({
+        id: db.photos.id,
+        albumId: db.photos.albumId,
+        url: db.photos.url,
+        clients: db.photos.clients,
+        paid: db.photos.paid
+    }).from(db.photos).innerJoin(topPhotoIds, eq(db.photos.id, topPhotoIds.maxId));
+    const unwatermarked = unwatermarkPhotos(topPhotos, 'force');
+    return info.map(album => ({
+        ...album,
+        topPhoto: unwatermarked.find(photo => photo.albumId === album.id)
+    })) as (AlbumType & { topPhoto?: PhotoType })[];
+}
+
+
 export async function albumPhotos(albumId: number): Promise<PhotoType[]> {
     const result = await db.db.select({
         id: db.photos.id,
@@ -41,6 +63,12 @@ export async function albumPhotos(albumId: number): Promise<PhotoType[]> {
         paid: db.photos.paid
     }).from(db.photos).where(eq(db.photos.albumId, albumId));
     return unwatermarkPhotos(result, 'force');
+}
+
+export async function getAlbum(albumId: number): Promise<AlbumType & { photos: PhotoType[] }> {
+    const info = await albumInfo(albumId);
+    const photos = await albumPhotos(albumId);
+    return { ...info[0], photos }
 }
 
 export async function labelAlbumAsPaid(albumId: number): Promise<void> {

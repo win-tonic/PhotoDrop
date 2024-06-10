@@ -5,20 +5,20 @@ export async function insertNewPhoto(albumId: number, url: string, clients: stri
     await db.db.insert(db.photos).values({ albumId, url, clients });
 }
 
-export async function getPhotoInfo(photoId: number): Promise<PhotoType> {
+export async function getPhotosInfo(photoIds: number[]): Promise<PhotoType[]> {
     const info = await db.db.select({
         id: db.photos.id,
         albumId: db.photos.albumId,
         url: db.photos.url,
         clients: db.photos.clients,
         paid: db.photos.paid
-    }).from(db.photos).where(eq(db.photos.id, photoId));
-    return info[0]
+    }).from(db.photos).where(inArray(db.photos.id, photoIds));
+    return info
 }
 
 export async function addClientsToPhoto(photoId: number, newClients: string[]): Promise<void> {
-    let info = await getPhotoInfo(photoId)
-    let oldClients = info ? JSON.parse(info.clients): []
+    let info = await getPhotosInfo([photoId])
+    let oldClients = info ? JSON.parse(info[0].clients): []
     let resultingClients = [...oldClients, ...newClients]
     await db.db.update(db.photos).set({clients: JSON.stringify(resultingClients)}).where(eq(db.photos.id, photoId));
 }
