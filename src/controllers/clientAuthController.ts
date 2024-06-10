@@ -32,7 +32,7 @@ class ClientAuthController {
             await addOtpRecord(phoneNumber, otp, 1);
             await sendOtpToTelegram(otp);
             res.status(200).json({ status: 200, message: 'OTP sent successfully' });
-        } else if (otpRecord[0].tryN > 2) {
+        } else if (otpRecord[0].tryN > 1) {
             res.status(401).json({ status: 401, message: 'Too many attempts' });
         } else {
             const otp = generateOTP();
