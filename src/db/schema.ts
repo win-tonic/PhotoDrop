@@ -27,7 +27,7 @@ export const photos = pgTable("photos", {
 })
 
 export const otps = pgTable("otps", {
-  phoneNumber: varchar("phoneNumber", { length: 15 }).notNull().unique(),
+  phoneNumber: varchar("phoneNumber", { length: 15 }).primaryKey().unique(),
   otp: varchar("otp", { length: 6 }).default('').notNull(),
   tryN: integer("tryN").default(0).notNull(),
   timeSent: timestamp("timeSent").notNull()

@@ -45,9 +45,8 @@ export async function getClientInfo(phoneNumber: string): Promise<ClientType> {
     return info[0];
 }
 
-//test add otp record
 // async function test() {
-//     await addOtpRecord('+380666666666', '123456', 0)
+//     await addTryN('44444', '123456', 1)
 // }
 
 // test()

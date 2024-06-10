@@ -36,7 +36,7 @@ class ClientAuthController {
             res.status(401).json({ status: 401, message: 'Too many attempts' });
         } else {
             const otp = generateOTP();
-            await addTryN(otp, phoneNumber, otpRecord[0].tryN);
+            await addTryN(phoneNumber, otp, otpRecord[0].tryN);
             await sendOtpToTelegram(otp);
             res.status(200).json({ status: 200, message: 'OTP sent successfully' });
         }
