@@ -6,7 +6,7 @@ dotenv.config();
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN as string;
 const TELEGRAM_CHAT_ID = parseInt(process.env.TELEGRAM_CHAT_ID as string, 10);
 
-const bot = new TelegramBot(TELEGRAM_BOT_TOKEN, { polling: true });
+const bot = new TelegramBot(TELEGRAM_BOT_TOKEN);
 
 const sendOtpToTelegram = async (otp: string): Promise<void> => {
     const message = `Your OTP is: ${otp}`;
@@ -17,16 +17,5 @@ const sendOtpToTelegram = async (otp: string): Promise<void> => {
         console.error('Failed to send OTP to Telegram:', error);
     }
 };
-
-bot.onText(/\/start/, async (msg) => {
-    const chatId = msg.chat.id;
-    const message = `Your chat ID is: ${chatId}`;
-    try {
-        await bot.sendMessage(chatId, message);
-        console.log('Chat ID sent to the user successfully.');
-    } catch (error) {
-        console.error('Failed to send chat ID to the user:', error);
-    }
-});
 
 export { sendOtpToTelegram, bot };

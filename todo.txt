@@ -1,3 +1,4 @@
 add hash password check
 maybe add middleware error handling
 maybe make interfaces
+make bot not polling all the time
