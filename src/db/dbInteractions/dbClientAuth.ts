@@ -40,7 +40,8 @@ export async function getClientInfo(phoneNumber: string): Promise<ClientType> {
     const info = await db.db.select({
         id: db.clients.id,
         phoneNumber: db.clients.phoneNumber,
-        name: db.clients.name
+        name: db.clients.name,
+        email: db.clients.email
     }).from(db.clients).where(eq(db.clients.phoneNumber, phoneNumber))
     return info[0];
 }

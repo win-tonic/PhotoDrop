@@ -12,7 +12,7 @@ export async function getPhotosInfo(photoIds: number[]): Promise<PhotoType[]> {
         albumId: db.photos.albumId,
         url: db.photos.url,
         clients: db.photos.clients,
-        price: db.albums.price,
+        price: db.photos.price,
         paid: db.photos.paid
     }).from(db.photos).where(inArray(db.photos.id, photoIds));
     return info.map(photo => { return { ...photo, url: generatePresignedUrl(photo.url) } })
@@ -32,5 +32,12 @@ export async function insertNewSelfie(phoneNumber: string, url: string): Promise
 
 export async function labelPhotosAsPaid(photoIds: number[]): Promise<void> {
     await db.db.update(db.photos).set({ paid: 1 }).where(inArray(db.photos.id, photoIds));
+}
+
+export async function getPhotoPrice(photoId: number): Promise<number> {
+    const info = await db.db.select({
+        price: db.photos.price
+    }).from(db.photos).where(eq(db.photos.id, photoId));
+    return info[0].price;
 }
 

@@ -81,3 +81,10 @@ export async function labelAlbumAsPaid(albumId: number): Promise<void> {
     await db.db.update(db.albums).set({ paid: 1 }).where(eq(db.albums.id, albumId));
     await db.db.update(db.photos).set({ paid: 1 }).where(eq(db.photos.albumId, albumId));
 }
+
+export async function getAlbumPrice(albumId: number): Promise<number> {
+    const info = await db.db.select({
+        price: db.albums.price
+    }).from(db.albums).where(eq(db.albums.id, albumId));
+    return info[0].price;
+}

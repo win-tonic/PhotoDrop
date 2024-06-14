@@ -47,6 +47,9 @@ importers:
       sharp-watermark:
         specifier: ^0.5.3
         version: 0.5.3
+      stripe:
+        specifier: ^15.11.0
+        version: 15.11.0
     devDependencies:
       '@types/bcryptjs':
         specifier: ^2.4.6
@@ -72,6 +75,9 @@ importers:
       '@types/pg':
         specifier: ^8.11.6
         version: 8.11.6
+      '@types/stripe':
+        specifier: ^8.0.417
+        version: 8.0.417
       dotenv:
         specifier: ^16.4.5
         version: 16.4.5
@@ -577,6 +583,10 @@ packages:
 
   '@types/serve-static@1.15.7':
     resolution: {integrity: sha512-W8Ym+h8nhuRwaKPaDw34QUkwsGi6Rc4yYqvKFo5rm2FUEhCFbzVWrxXUxuKK8TASjWsysJY0nsmNCGhCOIsrOw==}
+
+  '@types/stripe@8.0.417':
+    resolution: {integrity: sha512-PTuqskh9YKNENnOHGVJBm4sM0zE8B1jZw1JIskuGAPkMB+OH236QeN8scclhYGPA4nG6zTtPXgwpXdp+HPDTVw==}
+    deprecated: This is a stub types definition. stripe provides its own type definitions, so you do not need this installed.
 
   '@types/tough-cookie@4.0.5':
     resolution: {integrity: sha512-/Ad8+nIOV7Rl++6f1BdKxFSMgmoqEoYbHRpPcx3JEfv8VRsQe9Z4mCXeJBzxs7mbHY/XOZZuXlRNfhpVPbs6ZA==}
@@ -1876,6 +1886,10 @@ packages:
     resolution: {integrity: sha512-4gB8na07fecVVkOI6Rs4e7T6NOTki5EmL7TUduTs6bu3EdnSycntVJ4re8kgZA+wx9IueI2Y11bfbgwtzuE0KQ==}
     engines: {node: '>=0.10.0'}
 
+  stripe@15.11.0:
+    resolution: {integrity: sha512-qmZF0PN1jRVpiQrXL8eTb9Jy/6S+aUlcDquKBFT2h3PkaD7RZ444FIojVXUg67FK2zFIUNXgMv02c7csdL5qHg==}
+    engines: {node: '>=12.*'}
+
   supports-preserve-symlinks-flag@1.0.0:
     resolution: {integrity: sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==}
     engines: {node: '>= 0.4'}
@@ -2436,6 +2450,10 @@ snapshots:
       '@types/http-errors': 2.0.4
       '@types/node': 20.14.2
       '@types/send': 0.17.4
+
+  '@types/stripe@8.0.417':
+    dependencies:
+      stripe: 15.11.0
 
   '@types/tough-cookie@4.0.5': {}
 
@@ -3934,6 +3952,11 @@ snapshots:
       safe-buffer: 5.1.2
 
   strip-json-comments@2.0.1: {}
+
+  stripe@15.11.0:
+    dependencies:
+      '@types/node': 20.14.2
+      qs: 6.11.0
 
   supports-preserve-symlinks-flag@1.0.0: {}
 

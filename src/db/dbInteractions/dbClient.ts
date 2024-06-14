@@ -7,7 +7,8 @@ export async function getClientInfo(phoneNumber: string): Promise<ClientType[]> 
     return await db.db.select({
         id: db.clients.id,
         phoneNumber: db.clients.phoneNumber,
-        name: db.clients.name
+        name: db.clients.name,
+        email: db.clients.email
     }).from(db.clients).where(eq(db.clients.phoneNumber, phoneNumber));
 }
 
@@ -22,6 +23,10 @@ export async function getClientSelfie(phoneNumber: string): Promise<Omit<SelfieT
 
 export async function changeName(phoneNumber: string, name: string): Promise<void> {
     await db.db.update(db.clients).set({ name }).where(eq(db.clients.phoneNumber, phoneNumber));
+}
+
+export async function changeEmail(phoneNumber: string, email: string): Promise<void> {
+    await db.db.update(db.clients).set({ email }).where(eq(db.clients.phoneNumber, phoneNumber));
 }
 
 export async function getClientAlbumsInfo(phoneNumber: string): Promise<AlbumType[]> {

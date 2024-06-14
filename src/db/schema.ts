@@ -37,7 +37,8 @@ export const otps = pgTable("otps", {
 export const clients = pgTable("clients", {
   id: serial("id").primaryKey(),
   phoneNumber: varchar("phoneNumber", { length: 15 }).notNull().unique(),
-  name: varchar("name", { length: 1000 })
+  name: varchar("name", { length: 1000 }),
+  email: varchar("email", { length: 1000 }).unique()
 })
 
 export const selfies = pgTable("selfies", {
@@ -45,4 +46,14 @@ export const selfies = pgTable("selfies", {
   phoneNumber: varchar("phoneNumber", { length: 15 }).notNull(),
   url: varchar("url", { length: 1000 }).notNull(),
   isDeleted: smallint("isDeleted").default(0).notNull()
+})
+
+export const paymentIntents = pgTable("paymentIntents", {
+  id: serial("id").primaryKey(),
+  itemType: varchar("itemType", { length: 1000 }).notNull(),
+  itemId: integer("itemId").notNull(),
+  userId: integer("userId").notNull(),
+  clientSecret: varchar("clientSecret", { length: 1000 }).notNull(),
+  timeCreated: timestamp("timeCreated").notNull(),
+  status: varchar("status", { length: 1000 }).notNull()
 })

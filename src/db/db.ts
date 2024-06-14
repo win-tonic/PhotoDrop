@@ -2,7 +2,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { pgTable } from "drizzle-orm/pg-core";
 import { type InferSelectModel } from 'drizzle-orm';
 import { Pool } from "pg";
-import { photographers, albums, photos, otps, clients, selfies } from "./schema";
+import { photographers, albums, photos, otps, clients, selfies, paymentIntents } from "./schema";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -17,6 +17,7 @@ class DB {
   otps: ReturnType<typeof pgTable>;
   clients: ReturnType<typeof pgTable>;
   selfies: ReturnType<typeof pgTable>;
+  paymentIntents: ReturnType<typeof pgTable>;
 
   constructor() {
     this.pool = new Pool({ connectionString });
@@ -27,6 +28,7 @@ class DB {
     this.otps = otps;
     this.clients = clients
     this.selfies = selfies
+    this.paymentIntents = paymentIntents
   }
 }
 
@@ -36,6 +38,7 @@ type PhotoType = InferSelectModel<typeof photos>;
 type OtpType = InferSelectModel<typeof otps>;
 type ClientType = InferSelectModel<typeof clients>;
 type SelfieType = InferSelectModel<typeof selfies>;
+type PaymentIntentType = InferSelectModel<typeof paymentIntents>;
 
 export const db = new DB();
-export type { PhotographerType, AlbumType, PhotoType, OtpType, ClientType, SelfieType };
+export type { PhotographerType, AlbumType, PhotoType, OtpType, ClientType, SelfieType, PaymentIntentType };

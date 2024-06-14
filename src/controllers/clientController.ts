@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { changeName, getClientInfo, getClientAlbums, getClientPhotos, getClientSelfie } from '../db/dbInteractions/dbClient';
+import { changeEmail, changeName, getClientInfo, getClientAlbums, getClientPhotos, getClientSelfie } from '../db/dbInteractions/dbClient';
 
 class ClientController {
     constructor() {
@@ -21,6 +21,13 @@ class ClientController {
         const name = req.body.name as string;
         await changeName(phoneNumber, name);
         res.status(200).json({ status: 200, message: 'Name changed successfully' });
+    }
+
+    public async changeEmail(req: Request, res: Response) {
+        const phoneNumber = res.locals.tokenInfo.phoneNumber;
+        const email = req.body.name as string;
+        await changeEmail(phoneNumber, email);
+        res.status(200).json({ status: 200, message: 'Email changed successfully' });
     }
 
     public async getAlbums(req: Request, res: Response) {
