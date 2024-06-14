@@ -1,5 +1,4 @@
-import { is } from "drizzle-orm";
-import { pgTable, serial, varchar, integer, timestamp, smallint } from "drizzle-orm/pg-core";
+import { pgTable, serial, varchar, integer, timestamp, smallint, real } from "drizzle-orm/pg-core";
 
 export const photographers = pgTable("photographers", {
   id: serial("id").primaryKey(),
@@ -15,6 +14,7 @@ export const albums = pgTable("albums", {
   name: varchar("name", { length: 1000 }).notNull(),
   location: varchar("location", { length: 1000 }).notNull(),
   datapicker: varchar("datapicker", { length: 1000 }).default('[]'),
+  price: real("price").notNull(),
   paid: smallint("paid").default(0).notNull()
 })
 
@@ -23,6 +23,7 @@ export const photos = pgTable("photos", {
   albumId: integer("albumId").notNull(),
   url: varchar("url", { length: 1000 }).notNull(),
   clients: varchar("clients", { length: 1000 }).default('[]').notNull(),
+  price: real("price").notNull(),
   paid: smallint("paid").default(0).notNull()
 })
 

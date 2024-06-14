@@ -1,5 +1,5 @@
-import { url } from "inspector";
-import { PhotoType } from "../db/db";
+import { PhotoType, SelfieType } from "../db/db";
+import { generatePresignedUrl } from "../services/s3service";
 
 export function generateOTP(): string {
     var chars = "0123456789";
@@ -32,6 +32,7 @@ export function unwatermarkPhotos(photos: PhotoType[], mode: 'force' | 'paidOnly
         });
     }
 }
+
 
 // async function test(){
 //     const photosDummyData = [

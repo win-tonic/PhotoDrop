@@ -1,6 +1,7 @@
 import { unwatermarkPhotos } from '../../utilities/utilities';
 import { db, ClientType, AlbumType, PhotoType, SelfieType } from '../db';
 import { eq, and, like, inArray, max } from 'drizzle-orm';
+import { generatePresignedUrl } from '../../services/s3service';
 
 export async function getClientInfo(phoneNumber: string): Promise<ClientType[]> {
     return await db.db.select({
@@ -16,7 +17,7 @@ export async function getClientSelfie(phoneNumber: string): Promise<Omit<SelfieT
         phoneNumber: db.selfies.phoneNumber,
         url: db.selfies.url
     }).from(db.selfies).where(and(eq(db.selfies.phoneNumber, phoneNumber), eq(db.selfies.isDeleted, 0)))
-    return result[0];
+    return { ...result[0], url: generatePresignedUrl(result[0].url) };
 }
 
 export async function changeName(phoneNumber: string, name: string): Promise<void> {
@@ -30,6 +31,7 @@ export async function getClientAlbumsInfo(phoneNumber: string): Promise<AlbumTyp
         name: db.albums.name,
         location: db.albums.location,
         datapicker: db.albums.datapicker,
+        price: db.albums.price,
         paid: db.albums.paid
     }).from(db.albums).where(like(db.albums.datapicker, `%${phoneNumber}%`));
 }
@@ -45,6 +47,7 @@ export async function getClientAlbums(phoneNumber: string): Promise<(AlbumType &
         albumId: db.photos.albumId,
         url: db.photos.url,
         clients: db.photos.clients,
+        price: db.photos.price,
         paid: db.photos.paid
     }).from(db.photos).innerJoin(topPhotoIds, eq(db.photos.id, topPhotoIds.maxId));
     // const topPhotos = await db.db.selectDistinctOn([db.photos.albumId], {
@@ -55,10 +58,20 @@ export async function getClientAlbums(phoneNumber: string): Promise<(AlbumType &
     //     paid: db.photos.paid
     // }).from(db.photos).where(inArray(db.photos.albumId, albumIds)).orderBy(db.photos.albumId, db.photos.id);
     const unwatermarked = unwatermarkPhotos(topPhotos, 'paidOnly');
-    return info.map(album => ({
+    const unsignedReturn = info.map(album => ({
         ...album,
         topPhoto: unwatermarked.find(photo => photo.albumId === album.id)
     })) as (AlbumType & { topPhoto?: PhotoType })[];
+    const signedReturn = unsignedReturn.map(album => {
+        if (album.topPhoto) {
+            return {
+                ...album,
+                topPhoto: { ...album.topPhoto, url: generatePresignedUrl(album.topPhoto.url) }
+            }
+        }
+        return album;
+    });
+    return signedReturn;
 }
 
 export async function getClientPhotos(phoneNumber: string, albumId: number): Promise<PhotoType[]> {
@@ -69,6 +82,7 @@ export async function getClientPhotos(phoneNumber: string, albumId: number): Pro
             albumId: db.photos.albumId,
             url: db.photos.url,
             clients: db.photos.clients,
+            price: db.photos.price,
             paid: db.photos.paid
         }).from(db.photos).where(like(db.photos.clients, `%${phoneNumber}%`));
     } else {
@@ -77,10 +91,11 @@ export async function getClientPhotos(phoneNumber: string, albumId: number): Pro
             albumId: db.photos.albumId,
             url: db.photos.url,
             clients: db.photos.clients,
+            price: db.photos.price,
             paid: db.photos.paid
         }).from(db.photos).where(and(eq(db.photos.albumId, albumId), like(db.photos.clients, `%${phoneNumber}%`)));
     }
-    return unwatermarkPhotos(result, 'paidOnly');
+    return unwatermarkPhotos(result, 'paidOnly').map(photo => { return { ...photo, url: generatePresignedUrl(photo.url) } });
 }
 
 

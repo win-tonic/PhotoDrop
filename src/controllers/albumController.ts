@@ -3,15 +3,28 @@ import { insertNewAlbum, getAlbum, photographerAlbums, albumPhotos, labelAlbumAs
 
 class AlbumController {
     public async createAlbum(req: Request, res: Response) {
-        const name = req.query.name as string;
-        const location = req.query.location as string;
-        const datapicker = req.query.datapicker as string;
+        const name = req.body.name as string;
+        const location = req.body.location as string;
+        const datapicker = req.body.datapicker as string;
+        const price = req.body.price as number;
         const photographerId = res.locals.tokenInfo.id;
-        if (!name || !location || !datapicker || !photographerId) {
-            res.status(400).send('Missing required information');
+        if (!name) {
+            res.status(400).send('Name is required');
             return;
         }
-        await insertNewAlbum(name, location, datapicker, photographerId);
+        if (!location) {
+            res.status(400).send('Location is required');
+            return;
+        }
+        if (!datapicker) {
+            res.status(400).send('Date is required');
+            return;
+        }
+        if (!price) {
+            res.status(400).send('Price is required');
+            return;
+        }
+        await insertNewAlbum(name, location, datapicker, photographerId, price);
         res.status(200).send('Album created');
     }
 

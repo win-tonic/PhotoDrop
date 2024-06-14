@@ -1,4 +1,3 @@
-add hash password check
-maybe add middleware error handling
-maybe make interfaces
-make bot not polling all the time
+make register photographer endpoint
+add payments with stripe
+add price to album creation

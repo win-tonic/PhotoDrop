@@ -29,10 +29,15 @@ class PhotoController {
     public async uploadPhotographerPhotos(req: Request, res: Response) {
         const albumId = parseInt(req.body.albumId as string, 10);
         const clients = req.body.clients as string || '[]';
+        const price = parseFloat(req.body.price as string);
 
-        if (isNaN(albumId)) {
+        if (!albumId) {
             return res.status(400).json({ status: 400, message: 'Invalid albumId' });
         }
+        if (!price) {
+            return res.status(400).json({ status: 400, message: 'Invalid price' });
+        }
+
 
         const files = req.files as Express.Multer.File[];
 
@@ -45,7 +50,7 @@ class PhotoController {
                 const watermarkedPhoto = await this._watermarkPhoto(file.buffer);
                 const watermarkedResult = await uploadFile(watermarkedPhoto, file.mimetype, 'photos/watermarked', file.originalname);
                 const originalResult = await uploadFile(file.buffer, file.mimetype, 'photos/original', file.originalname);
-                await insertNewPhoto(albumId, watermarkedResult.Location, clients);
+                await insertNewPhoto(albumId, watermarkedResult.key, clients, price);
             }
             res.status(200).json({ status: 200, message: 'Files uploaded successfully' });
         } catch (error) {
@@ -70,7 +75,7 @@ class PhotoController {
         try {
             for (const file of files) {
                 const result = await uploadFile(file.buffer, file.mimetype, 'selfies', file.originalname);
-                await insertNewSelfie(clientPhoneNumber, result.Location);
+                await insertNewSelfie(clientPhoneNumber, result.key);
             }
             res.status(200).json({ status: 200, message: 'Files uploaded successfully' });
         } catch (error) {

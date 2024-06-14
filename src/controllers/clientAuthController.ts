@@ -22,6 +22,10 @@ class ClientAuthController {
 
     public async sendOtp(req: Request, res: Response) {
         const phoneNumber = req.body.phoneNumber as string;
+        if (!phoneNumber) {
+            res.status(400).json({ status: 400, message: 'Phone number is required' });
+            return;
+        }
         const otpRecord = await getOtpRecord(phoneNumber);
         if (!otpRecord[0]) {
             const otp = generateOTP();
