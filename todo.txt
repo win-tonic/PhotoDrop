@@ -1,3 +1,2 @@
-make register photographer endpoint
-add payments with stripe
-add price to album creation
+make testing with 
+stripe trigger payment_intent.succeeded --add payment_intent:metadata['itemType']='photo' --add payment_intent:metadata['itemId']='9' --add payment_intent:metadata['userId']='7'

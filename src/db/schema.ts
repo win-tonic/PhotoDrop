@@ -49,7 +49,7 @@ export const selfies = pgTable("selfies", {
 })
 
 export const paymentIntents = pgTable("paymentIntents", {
-  id: serial("id").primaryKey(),
+  id: varchar("id", {length: 100}).primaryKey(),
   itemType: varchar("itemType", { length: 1000 }).notNull(),
   itemId: integer("itemId").notNull(),
   userId: integer("userId").notNull(),

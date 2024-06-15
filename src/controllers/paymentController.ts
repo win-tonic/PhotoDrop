@@ -5,7 +5,7 @@ import { albumInfo } from '../db/dbInteractions/dbAlbum';
 import { getPhotosInfo } from '../db/dbInteractions/dbPhoto';
 import { labelPhotosAsPaid } from '../db/dbInteractions/dbPhoto';
 import { labelAlbumAsPaid } from '../db/dbInteractions/dbAlbum';
-import { addPaymentIntentRecord, getPaymentIntentRecord, getPaymentIntentRecordByClientSecret, updatePaymentIntentRecord } from '../db/dbInteractions/dbPayments';
+import { addPaymentIntentRecord, getPaymentIntentRecord, updatePaymentIntentRecord } from '../db/dbInteractions/dbPayments';
 
 dotenv.config();
 
@@ -42,10 +42,10 @@ class PaymentController {
 
             const price = info[0].price * 100; // Convert to cents
             const metadata = { itemType, itemId, userId };
-            const clientSecret = await createPaymentIntent(price, paymentMethod, metadata);
+            const {clientSecret, paymentIntentId} = await createPaymentIntent(price, paymentMethod, metadata);
             await addPaymentIntentRecord(itemType, itemId, userId, clientSecret || '')
 
-            res.status(200).json({ clientSecret });
+            res.status(200).json({ clientSecret, paymentIntentId});
         } catch (error) {
             console.error('Error creating payment intent:', error);
             res.status(500).json({ error: 'Internal Server Error' });
@@ -57,16 +57,22 @@ class PaymentController {
 
         try {
             const event = verifyStripeSignature(req.body, sig);
-            const result = await handleStripeWebhook(event);
-            if (result.success && result.metadata) {
-                if (result.metadata.itemType === 'photo') {
-                    await labelPhotosAsPaid([parseInt(result.metadata.itemId, 10)]);
-                } else if (result.metadata.itemType === 'album') {
-                    await labelAlbumAsPaid(parseInt(result.metadata.itemId, 10));
+            if (event.type === 'payment_intent.succeeded'){
+                const paymentIntentId = event.data.object.id;
+                const intentInfo = await getPaymentIntentRecord(paymentIntentId);
+                if (!intentInfo || !intentInfo[0]) {
+                    return res.status(404).json({ error: 'Payment intent not found' });
                 }
-                await updatePaymentIntentRecord(result.metadata.itemType, parseInt(result.metadata.itemId, 10), 'SUCCEEDED');
-            } else if (result.success === 0 && result.metadata) {
-                await updatePaymentIntentRecord(result.metadata.itemType, parseInt(result.metadata.itemId, 10), 'FAILED');
+                if (intentInfo[0].itemType === 'photo') {
+                    await labelPhotosAsPaid([intentInfo[0].itemId]);
+                }
+                if (intentInfo[0].itemType === 'album') {
+                    await labelAlbumAsPaid(intentInfo[0].itemId);
+                }
+                await updatePaymentIntentRecord(paymentIntentId, 'SUCCEEDED');
+            } else if (event.type === 'payment_intent.payment_failed') {
+                const paymentIntentId = event.data.object.id;
+                await updatePaymentIntentRecord(paymentIntentId, 'FAILED');
             }
             res.status(200).json({ received: true });
         } catch (error) {
@@ -81,15 +87,13 @@ class PaymentController {
     }
 
     public async getPaymentIntentStatus(req: Request, res: Response) {
-        const itemType = req.query.itemType as string;
-        const itemId = parseInt(req.query.itemId as string, 10);
-        const clientSecret = req.query.clientSecret as string;
+        const paymentIntentId = req.query.paymentIntentId as string;
         const userId = res.locals.tokenInfo.id;
         try {
-            if ((!itemId || !itemType) && (!clientSecret)) {
+            if (!paymentIntentId) {
                 return res.status(400).json({ error: 'Item not specified' });
             }
-            const paymentIntent = clientSecret ? await getPaymentIntentRecordByClientSecret(clientSecret) : await getPaymentIntentRecord(itemType, itemId);
+            const paymentIntent = await getPaymentIntentRecord(paymentIntentId)
             if (!paymentIntent || !paymentIntent[0]) {
                 return res.status(404).json({ error: 'Payment intent not found' });
             }

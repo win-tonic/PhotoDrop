@@ -12,7 +12,8 @@ export async function createPaymentIntent(price: number, paymentMethodId: string
         payment_method: paymentMethodId,
         metadata: metadata,
     });
-    return paymentIntent.client_secret;
+    return {clientSecret: paymentIntent.client_secret,
+            paymentIntentId: paymentIntent.id};
 }
 
 
@@ -74,6 +75,7 @@ export async function handleStripeWebhook(event: Stripe.Event) {
          return {
             success: event.type === 'payment_intent.succeeded' ? 1 : 0,
             metadata: intent.metadata,
+            clientSecret: intent.client_secret,
             event
         };
     }
