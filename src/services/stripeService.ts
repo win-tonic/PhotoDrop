@@ -5,15 +5,13 @@ dotenv.config();
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
-export async function createPaymentIntent(price: number, paymentMethodId: string, metadata: Record<string, any>) {
+export async function createPaymentIntent(price: number, metadata: Record<string, any>) {
     const paymentIntent = await stripe.paymentIntents.create({
         amount: price,
         currency: 'usd',
-        payment_method: paymentMethodId,
         metadata: metadata,
     });
-    return {clientSecret: paymentIntent.client_secret,
-            paymentIntentId: paymentIntent.id};
+    return paymentIntent.client_secret
 }
 
 

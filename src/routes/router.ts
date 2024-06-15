@@ -30,7 +30,7 @@ router.post('/uploadPhotos', upload.array('photos', 10), errorMiddleware(needsPh
 router.post('/uploadSelfies', upload.array('selfies', 10), errorMiddleware(needsClientToken(photoController.uploadSelfies)));
 router.post('/addClients', errorMiddleware(needsPhotographerToken(photoController.addClients)))
 
-router.post('/stripe/createPaymentIntent', errorMiddleware(needsClientToken(paymentController.createPaymentIntent)));
+router.post('/stripe/createPaymentIntent', errorMiddleware(needsClientToken(paymentController.createPayment)));
 router.get('/stripe/getPaymentIntentStatus', errorMiddleware(needsClientToken(paymentController.getPaymentIntentStatus)));
 router.post('/stripe/webhook', errorMiddleware(paymentController.webhook));
 

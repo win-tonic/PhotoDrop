@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import dotenv from 'dotenv';
-import { createPaymentIntent, handleStripeWebhook, verifyStripeSignature } from '../services/stripeService';
+import { createPaymentIntent, verifyStripeSignature } from '../services/stripeService';
 import { albumInfo } from '../db/dbInteractions/dbAlbum';
 import { getPhotosInfo } from '../db/dbInteractions/dbPhoto';
 import { labelPhotosAsPaid } from '../db/dbInteractions/dbPhoto';
@@ -11,18 +11,15 @@ dotenv.config();
 
 class PaymentController {
     constructor() {
-        this.createPaymentIntent = this.createPaymentIntent.bind(this);
+        this.createPayment = this.createPayment.bind(this);
         this.webhook = this.webhook.bind(this);
     }
 
-    public async createPaymentIntent(req: Request, res: Response) {
-        const { itemType, itemId, paymentMethod } = req.body;
+    public async createPayment(req: Request, res: Response) {
+        const { itemType, itemId } = req.body;
         const userId = res.locals.tokenInfo.id;
 
         try {
-            if (!paymentMethod) {
-                return res.status(400).json({ error: `Payment token not specified!` });
-            }
             let info;
             if (!itemId || !itemType) {
                 return res.status(400).json({ error: 'Item not specified' });
@@ -42,10 +39,9 @@ class PaymentController {
 
             const price = info[0].price * 100; // Convert to cents
             const metadata = { itemType, itemId, userId };
-            const {clientSecret, paymentIntentId} = await createPaymentIntent(price, paymentMethod, metadata);
-            await addPaymentIntentRecord(itemType, itemId, userId, clientSecret || '')
-
-            res.status(200).json({ clientSecret, paymentIntentId});
+            const clientSecret = await createPaymentIntent(price, metadata) as string;
+            await addPaymentIntentRecord(itemType, itemId, userId, clientSecret)
+            res.status(200).json({ clientSecret });
         } catch (error) {
             console.error('Error creating payment intent:', error);
             res.status(500).json({ error: 'Internal Server Error' });
@@ -58,8 +54,8 @@ class PaymentController {
         try {
             const event = verifyStripeSignature(req.body, sig);
             if (event.type === 'payment_intent.succeeded'){
-                const paymentIntentId = event.data.object.id;
-                const intentInfo = await getPaymentIntentRecord(paymentIntentId);
+                const clientSecret = event.data.object.client_secret as string;
+                const intentInfo = await getPaymentIntentRecord(clientSecret);
                 if (!intentInfo || !intentInfo[0]) {
                     return res.status(404).json({ error: 'Payment intent not found' });
                 }
@@ -69,10 +65,10 @@ class PaymentController {
                 if (intentInfo[0].itemType === 'album') {
                     await labelAlbumAsPaid(intentInfo[0].itemId);
                 }
-                await updatePaymentIntentRecord(paymentIntentId, 'SUCCEEDED');
+                await updatePaymentIntentRecord(clientSecret, 'SUCCEEDED');
             } else if (event.type === 'payment_intent.payment_failed') {
-                const paymentIntentId = event.data.object.id;
-                await updatePaymentIntentRecord(paymentIntentId, 'FAILED');
+                const clientSecret = event.data.object.client_secret as string;
+                await updatePaymentIntentRecord(clientSecret, 'FAILED');
             }
             res.status(200).json({ received: true });
         } catch (error) {
@@ -87,13 +83,13 @@ class PaymentController {
     }
 
     public async getPaymentIntentStatus(req: Request, res: Response) {
-        const paymentIntentId = req.query.paymentIntentId as string;
+        const clientSecret = req.query.clientSecret as string;
         const userId = res.locals.tokenInfo.id;
         try {
-            if (!paymentIntentId) {
+            if (!clientSecret) {
                 return res.status(400).json({ error: 'Item not specified' });
             }
-            const paymentIntent = await getPaymentIntentRecord(paymentIntentId)
+            const paymentIntent = await getPaymentIntentRecord(clientSecret)
             if (!paymentIntent || !paymentIntent[0]) {
                 return res.status(404).json({ error: 'Payment intent not found' });
             }
