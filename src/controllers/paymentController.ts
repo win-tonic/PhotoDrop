@@ -5,6 +5,7 @@ import { albumInfo } from '../db/dbInteractions/dbAlbum';
 import { getPhotosInfo } from '../db/dbInteractions/dbPhoto';
 import { labelPhotosAsPaid } from '../db/dbInteractions/dbPhoto';
 import { labelAlbumAsPaid } from '../db/dbInteractions/dbAlbum';
+import { getClientInfo } from '../db/dbInteractions/dbClient';
 import { addPaymentIntentRecord, getPaymentIntentRecord, updatePaymentIntentRecord } from '../db/dbInteractions/dbPayments';
 
 dotenv.config();
@@ -18,6 +19,8 @@ class PaymentController {
     public async createPayment(req: Request, res: Response) {
         const { itemType, itemId } = req.body;
         const userId = res.locals.tokenInfo.id;
+        const phoneNumber = res.locals.tokenInfo.phoneNumber;
+        let email = res.locals.tokenInfo.email;
 
         try {
             let info;
@@ -36,9 +39,16 @@ class PaymentController {
             else if (info[0].paid) {
                 return res.status(400).json({ error: 'Item already paid' });
             }
+            if (!email){
+                const userInfo = await getClientInfo(phoneNumber);
+                if (!userInfo || !userInfo[0]) {
+                    return res.status(500).json({ error: 'Internal server error' });
+                }
+                email = userInfo[0].email;
+            }
 
             const price = info[0].price * 100; // Convert to cents
-            const metadata = { itemType, itemId, userId };
+            const metadata = { itemType, itemId, userId, email};
             const clientSecret = await createPaymentIntent(price, metadata) as string;
             await addPaymentIntentRecord(itemType, itemId, userId, clientSecret)
             res.status(200).json({ clientSecret });

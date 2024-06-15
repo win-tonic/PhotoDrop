@@ -1,2 +1,2 @@
 make testing with 
-stripe trigger payment_intent.succeeded --add payment_intent:metadata['itemType']='photo' --add payment_intent:metadata['itemId']='9' --add payment_intent:metadata['userId']='7'
+stripe payment_intents confirm pi_3PRqxVRs4PB16les1fvwV97c --payment-method="pm_card_visa" --return-url="https://www.example.com"
