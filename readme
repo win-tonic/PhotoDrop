@@ -1,0 +1,150 @@
+# PhotoDrop API Documentation
+
+## Overview
+
+The PhotoDrop API provides endpoints for various functionalities related to photographers and clients, including authentication, account management, album creation, photo uploading, and payment processing using Stripe.
+
+Base URL: https: //photodrop.onrender.com
+
+## Endpoints
+
+### Authentication
+
+**POST /loginPhotographer**  
+Headers: None  
+Body: {
+    "login": string,
+    "password": string
+}
+
+**POST /getOtp**  
+Headers: None  
+Body: {
+    "phoneNumber": string
+}
+
+**GET /checkOtp**  
+Headers: None  
+Body: {
+    "phoneNumber": string,
+    "otp": string
+}
+
+### Client Account Management
+
+**GET /getClientInfo**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: None
+
+**POST /changeName**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: {
+    "name": string
+}
+
+**POST /changeEmail**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: {
+    "email": string
+}
+
+**GET /getClientAlbums**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+
+**GET /getClientPhotos**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: None
+
+**GET /getClientDashboard**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: None
+
+### Photographer Account Management
+
+**POST /createAlbum**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: {
+    "name": string,
+    "price": number,
+    "location": string,
+    "datapicker": string
+}
+
+**GET /getPhotographerAlbums**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: None
+
+**GET /getAlbumInfo?id=string**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: None
+
+### Photo Management
+
+**POST /uploadPhotos**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: {
+    "albumId": string,
+    "clients": string,
+    "price": string,
+    "photos": files
+}
+
+**POST /uploadSelfies**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: {
+    "selfies": files
+}
+
+**POST /addClients**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: {
+    "photoId": number,
+    "clients": string
+}
+
+### Payments
+
+**POST /stripe/createPaymentIntent**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: {
+    "itemType": "photo" | "album",
+    "itemId": string
+}
+Output: {
+    "clientSecret": string
+}
+
+**GET /stripe/getPaymentIntentStatus?clientSecret=string**  
+Headers: {
+    "Authorization": "Bearer jwt_token"
+}
+Body: None
+Output{
+    "paymentStatus": string
+}
