@@ -14,48 +14,29 @@ const verifyToken = (token: string, key: string): string | jwt.JwtPayload | unde
     }
 };
 
-const authenticate = (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) {
-        return res.status(401).json({ status: 401, message: 'No token provided' });
-    }
-    const decoded = verifyToken(token, SECRET_KEY);
-    if (!decoded) {
-        return res.status(401).json({ status: 401, message: 'Invalid token' });
-    }
-    next();
+const needsToken = (secretKey: string, controller: (req: Request, res: Response, next: NextFunction) => void) => {
+    return (req: Request, res: Response, next: NextFunction) => {
+        const token = req.headers.authorization?.split(' ')[1] || req.headers.authorization;
+        if (!token) {
+            return res.status(401).json({ message: 'No token provided' });
+        }
+        const decoded = verifyToken(token, secretKey);
+        if (!decoded) {
+            return res.status(401).json({ message: 'Invalid token' });
+        }
+        res.locals = { ...res.locals, tokenInfo: decoded };
+        controller(req, res, next);
+    };
 };
 
 const needsPhotographerToken = (controller: (req: Request, res: Response, next: NextFunction) => void) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        const token = req.headers.authorization?.split(' ')[1] || req.headers.authorization;
-        if (!token) {
-            return res.status(401).json({ status: 401, message: 'No token provided' });
-        }
-        const decoded = verifyToken(token, SECRET_KEY);
-        if (!decoded) {
-            return res.status(401).json({ status: 401, message: 'Invalid token' });
-        }
-        res.locals = {...res.locals, tokenInfo: decoded}
-        controller(req, res, next);
-    };
+    return needsToken(SECRET_KEY, controller);
 };
 
 const needsClientToken = (controller: (req: Request, res: Response, next: NextFunction) => void) => {
-    return (req: Request, res: Response, next: NextFunction) => {
-        const token = req.headers.authorization?.split(' ')[1] || req.headers.authorization;
-        if (!token) {
-            return res.status(401).json({ status: 401, message: 'No token provided' });
-        }
-        const decoded = verifyToken(token, CLIENT_SECRET_KEY);
-        if (!decoded) {
-            return res.status(401).json({ status: 401, message: 'Invalid token' });
-        }
-        res.locals = {...res.locals, tokenInfo: decoded}
-        controller(req, res, next);
-    };
+    return needsToken(CLIENT_SECRET_KEY, controller);
 };
 
 
 
-export {authenticate, needsPhotographerToken, needsClientToken}
+export { needsPhotographerToken, needsClientToken }
