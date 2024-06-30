@@ -3,10 +3,7 @@ import { pgTable } from "drizzle-orm/pg-core";
 import { type InferSelectModel } from 'drizzle-orm';
 import { Pool } from "pg";
 import { photographers, albums, photos, otps, clients, selfies, paymentIntents } from "./schema";
-import dotenv from "dotenv";
-dotenv.config();
-
-const connectionString = process.env.DB_CONNECTION_STRING as string;
+import { DB_CONNECTION_STRING } from "../config/config";
 
 class DB {
   pool: Pool;
@@ -20,7 +17,7 @@ class DB {
   paymentIntents: ReturnType<typeof pgTable>;
 
   constructor() {
-    this.pool = new Pool({ connectionString });
+    this.pool = new Pool({ connectionString: DB_CONNECTION_STRING});
     this.db = drizzle(this.pool);
     this.photographers = photographers;
     this.albums = albums;

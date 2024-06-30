@@ -1,9 +1,8 @@
 import Stripe from 'stripe';
-import dotenv from 'dotenv';
-dotenv.config();
+import {STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET} from '../config/config';
 
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
+const stripe = new Stripe(STRIPE_SECRET_KEY);
 
 export async function createPaymentIntent(price: number, metadata: Record<string, any>) {
     const paymentIntent = await stripe.paymentIntents.create({
@@ -16,7 +15,7 @@ export async function createPaymentIntent(price: number, metadata: Record<string
 }
 
 export function verifyStripeSignature(payload: Buffer, sig: string | undefined): Stripe.Event {
-    const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
+    const endpointSecret = STRIPE_WEBHOOK_SECRET;
     if (!sig || !endpointSecret) {
         throw new Error('Missing Stripe signature or endpoint secret');
     }

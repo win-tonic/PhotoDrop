@@ -4,10 +4,7 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import { checkPhotographersCreds, getPhotographerInfo } from '../db/dbInteractions/dbPhotographerAuth';
-import dotenv from "dotenv";
-dotenv.config();
-
-const SECRET_KEY_PHOTOGRAPHERS = process.env.PHOTOGRAPHERS_SECRET_KEY as string;
+import { SECRET_KEY } from '../config/config';
 
 class PhtotographerAuthController {
     constructor() {
@@ -18,7 +15,7 @@ class PhtotographerAuthController {
 
     private async generatePhotographerLoginToken(login: string): Promise<string> {
         const userInfo = await getPhotographerInfo(login);
-        return jwt.sign(userInfo, SECRET_KEY_PHOTOGRAPHERS, { expiresIn: '1d' });
+        return jwt.sign(userInfo, SECRET_KEY, { expiresIn: '1d' });
     }
 
     private async authenticatePhotographer(login: string, password: string): Promise<string | undefined> {
@@ -35,7 +32,7 @@ class PhtotographerAuthController {
         if (token) {
             res.status(200).json({ token });
         } else {
-            res.status(401).json({ status: 401, message: 'Failed to log in' });
+            res.status(401).json({ message: 'Failed to log in' });
         }
     }
 }

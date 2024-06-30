@@ -2,11 +2,8 @@ import { Request, Response } from 'express';
 import { addOtpRecord, getOtpRecord, clearOtpRecord, addTryN, checkIfClientExists, addClient, getClientInfo } from '../db/dbInteractions/dbClientAuth';
 import { sendOtpToTelegram } from '../services/telegramBot';
 import { generateOTP } from '../utilities/utilities';
+import {CLIENT_SECRET_KEY} from '../config/config';
 import jwt from 'jsonwebtoken';
-import dotenv from "dotenv";
-dotenv.config();
-
-const SECRET_KEY_CLIENTS = process.env.CLIENTS_SECRET_KEY as string;
 
 class ClientAuthController {
     constructor() {
@@ -17,13 +14,13 @@ class ClientAuthController {
 
     private async generateClientLoginToken(phone: string): Promise<string> {
         const userInfo = await getClientInfo(phone);
-        return jwt.sign(userInfo, SECRET_KEY_CLIENTS, { expiresIn: '1d' });
+        return jwt.sign(userInfo, CLIENT_SECRET_KEY, { expiresIn: '1d' });
     }
 
     public async sendOtp(req: Request, res: Response) {
         const phoneNumber = req.body.phoneNumber as string;
         if (!phoneNumber) {
-            res.status(400).json({ status: 400, message: 'Phone number is required' });
+            res.status(400).json({ message: 'Phone number is required' });
             return;
         }
         const otpRecord = await getOtpRecord(phoneNumber);
@@ -35,14 +32,14 @@ class ClientAuthController {
             }
             await addOtpRecord(phoneNumber, otp, 1);
             await sendOtpToTelegram(otp);
-            res.status(200).json({ status: 200, message: 'OTP sent successfully' });
+            res.status(200).json({ message: 'OTP sent successfully' });
         } else if (otpRecord[0].tryN > 1) {
-            res.status(401).json({ status: 401, message: 'Too many attempts' });
+            res.status(401).json({ message: 'Too many attempts' });
         } else {
             const otp = generateOTP();
             await addTryN(phoneNumber, otp, otpRecord[0].tryN);
             await sendOtpToTelegram(otp);
-            res.status(200).json({ status: 200, message: 'OTP sent successfully' });
+            res.status(200).json({ message: 'OTP sent successfully' });
         }
     }
 
@@ -51,14 +48,14 @@ class ClientAuthController {
         const otp = req.query.otp as string;
         const otpRecord = await getOtpRecord(phoneNumber);
         if (!otpRecord[0]) {
-            res.status(404).json({ status: 404, message: 'OTP not found' });
+            res.status(404).json({ message: 'OTP not found' });
         } else if (otpRecord[0].otp != otp) {
-            res.status(401).json({ status: 401, message: 'Invalid OTP' });
+            res.status(401).json({ message: 'Invalid OTP' });
         } else if (otpRecord[0].tryN > 2) {
-            res.status(401).json({ status: 401, message: 'Too many attempts' });
+            res.status(401).json({ message: 'Too many attempts' });
         } else if (new Date().getTime() - otpRecord[0].timeSent.getTime() > 180000) {
             console.log()
-            res.status(401).json({ status: 401, message: 'OTP expired' });
+            res.status(401).json({ message: 'OTP expired' });
         } else {
             await clearOtpRecord(phoneNumber);
             const token = await this.generateClientLoginToken(phoneNumber);

@@ -1,10 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import dotenv from "dotenv";
-dotenv.config();
-
-const SECRET_KEY = process.env.PHOTOGRAPHERS_SECRET_KEY as string;
-const CLIENT_SECRET_KEY = process.env.CLIENTS_SECRET_KEY as string;
+import { SECRET_KEY, CLIENT_SECRET_KEY } from '../config/config';
 
 const verifyToken = (token: string, key: string): string | jwt.JwtPayload | undefined => {
     try {

@@ -1,17 +1,15 @@
 import AWS from 'aws-sdk';
-import dotenv from 'dotenv';
-
-dotenv.config();
+import {AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, BUCKET_NAME} from '../config/config';
 
 const s3 = new AWS.S3({
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID as string,
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY as string,
+    accessKeyId: AWS_ACCESS_KEY_ID,
+    secretAccessKey: AWS_SECRET_ACCESS_KEY,
     region: 'eu-central-1'
 });
 
 export async function uploadFile(buffer: Buffer, mimetype: string, folder: string, filename: string): Promise<{ key: string }> {
     const params = {
-        Bucket: process.env.BUCKET_NAME!,
+        Bucket: BUCKET_NAME,
         Key: `${folder}/${filename}`,
         Body: buffer,
         ContentType: mimetype
@@ -25,7 +23,7 @@ export async function uploadFile(buffer: Buffer, mimetype: string, folder: strin
 
 export const generatePresignedUrl = (key: string): string => {
     const params = {
-        Bucket: process.env.BUCKET_NAME!,
+        Bucket: BUCKET_NAME,
         Key: key,
         Expires: 3600
     };

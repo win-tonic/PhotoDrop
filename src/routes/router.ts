@@ -10,25 +10,25 @@ import { paymentController } from "../controllers/paymentController";
 
 const router = Router();
 
-router.post('/loginPhotographer', errorMiddleware(photographerAuthController.loginPhotographer));
+router.post('/photographer/login', errorMiddleware(photographerAuthController.loginPhotographer));
 
-router.post('/getOtp', errorMiddleware(clientAuthController.sendOtp));
-router.get('/checkOtp', errorMiddleware(clientAuthController.checkOtp));
+router.post('/client/getOtp', errorMiddleware(clientAuthController.sendOtp));
+router.get('/client/checkOtp', errorMiddleware(clientAuthController.checkOtp));
 
-router.get('/getClientInfo', errorMiddleware(needsClientToken(clientController.getInfo)));
-router.post('/changeName', errorMiddleware(needsClientToken(clientController.changeName)));
-router.post('/changeEmaiil', errorMiddleware(needsClientToken(clientController.changeEmail)));
-router.get('/getClientAlbums', errorMiddleware(needsClientToken(clientController.getAlbums)));
-router.get('/getClientPhotos', errorMiddleware(needsClientToken(clientController.getPhotos)));
-router.get('/getClientDashboard', errorMiddleware(needsClientToken(clientController.getDashboard)));
+router.get('/client/info', errorMiddleware(needsClientToken(clientController.getInfo)));
+router.post('/client/change/name', errorMiddleware(needsClientToken(clientController.changeName)));
+router.post('/client/change/email', errorMiddleware(needsClientToken(clientController.changeEmail)));
+router.get('/client/albums', errorMiddleware(needsClientToken(clientController.getAlbums)));
+router.get('/client/photos', errorMiddleware(needsClientToken(clientController.getPhotos)));
+router.get('/client/dashboard', errorMiddleware(needsClientToken(clientController.getDashboard)));
 
-router.post('/createAlbum', errorMiddleware(needsPhotographerToken(albumController.createAlbum)));
-router.get('/getPhotographerAlbums', errorMiddleware(needsPhotographerToken(albumController.getAlbums)));
-router.get('/getAlbumInfo', errorMiddleware(needsPhotographerToken(albumController.getInfo)));
+router.post('/photographer/newAlbum', errorMiddleware(needsPhotographerToken(albumController.createAlbum)));
+router.get('/photographer/albums', errorMiddleware(needsPhotographerToken(albumController.getAlbums)));
+router.get('/photographer/albumInfo', errorMiddleware(needsPhotographerToken(albumController.getInfo)));
 
-router.post('/uploadPhotos', upload.array('photos', 10), errorMiddleware(needsPhotographerToken(photoController.uploadPhotographerPhotos)));
-router.post('/uploadSelfies', upload.array('selfies', 10), errorMiddleware(needsClientToken(photoController.uploadSelfies)));
-router.post('/addClients', errorMiddleware(needsPhotographerToken(photoController.addClients)))
+router.post('/photographer/uploadPhotos', upload.array('photos', 10), errorMiddleware(needsPhotographerToken(photoController.uploadPhotographerPhotos)));
+router.post('/client/uploadSelfies', upload.array('selfies', 10), errorMiddleware(needsClientToken(photoController.uploadSelfies)));
+router.post('/photographer/clients', errorMiddleware(needsPhotographerToken(photoController.addClients)))
 
 router.post('/stripe/createPaymentIntent', errorMiddleware(needsClientToken(paymentController.createPayment)));
 router.get('/stripe/getPaymentIntentStatus', errorMiddleware(needsClientToken(paymentController.getPaymentIntentStatus)));

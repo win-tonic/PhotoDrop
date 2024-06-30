@@ -1,17 +1,14 @@
 import express from 'express';
 import cors from 'cors';
 import { router } from './routes/router';
-import dotenv from 'dotenv';
 import { customBodyParser } from './middleware/bodyParser';
-dotenv.config();
-
-const port = process.env.PORT || 3000;
+import { PORT } from './config/config';
 
 const app = express();
 app.use(cors());
 app.use(customBodyParser)
 app.use(router);
 
-app.listen(port, () => {  
-    console.log(`Server is running on http://localhost:${port}/`);
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}/`);
 });
