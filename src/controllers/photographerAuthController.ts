@@ -30,7 +30,7 @@ class PhotographerAuthController {
         const fullname = req.body.fullname as string;
         const email = req.body.email as string;
 
-        if (!login || !password || !fullname || !email) {
+        if (!login || !password) {
             throw new CustomError('All fields are required', 400);
         }
 
