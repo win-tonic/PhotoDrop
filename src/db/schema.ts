@@ -2,8 +2,8 @@ import { pgTable, serial, varchar, integer, timestamp, smallint, real } from "dr
 
 export const photographers = pgTable("photographers", {
   id: serial("id").primaryKey(),
-  login: varchar("login", { length: 1000 }).unique(),
-  password: varchar("password", { length: 1000 }),
+  login: varchar("login", { length: 1000 }).unique().notNull(),
+  password: varchar("password", { length: 1000 }).notNull(),
   fullname: varchar("fullname", { length: 1000 }),
   email: varchar("email", { length: 1000 })
 });

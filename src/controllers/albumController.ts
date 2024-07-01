@@ -1,55 +1,49 @@
 import { Request, Response } from 'express';
-import { insertNewAlbum, getAlbum, photographerAlbums, albumPhotos, labelAlbumAsPaid } from '../db/dbInteractions/dbAlbum';
+import { albumService } from '../services/albumService';
+import { CustomError } from '../middleware/errorHandler';
 
 class AlbumController {
     public async createAlbum(req: Request, res: Response) {
-        const name = req.body.name as string;
-        const location = req.body.location as string;
-        const datapicker = req.body.datapicker as string;
-        const price = req.body.price as number;
+        const { name, location, datapicker, price } = req.body;
         const photographerId = res.locals.tokenInfo.id;
-        if (!name) {
-            res.status(400).send('Name is required');
-            return;
-        }
-        if (!location) {
-            res.status(400).send('Location is required');
-            return;
-        }
-        if (!datapicker) {
-            res.status(400).send('Date is required');
-            return;
-        }
-        if (!price) {
-            res.status(400).send('Price is required');
-            return;
-        }
-        await insertNewAlbum(name, location, datapicker, photographerId, price);
+
+        if (!name) throw new CustomError('Name is required', 400);
+        if (!location) throw new CustomError('Location is required', 400);
+        if (!datapicker) throw new CustomError('Date is required', 400);
+        if (!price) throw new CustomError('Price is required', 400);
+
+        await albumService.createAlbum({ name, location, datapicker, price, photographerId });
         res.status(200).send('Album created');
     }
 
     public async getInfo(req: Request, res: Response) {
-        const id = parseInt(req.query.id as string, 10)
-        const info = await getAlbum(id)
-        res.json(info)
+        const id = parseInt(req.query.id as string, 10);
+        if (isNaN(id)) throw new CustomError('Invalid album ID', 400);
+
+        const info = await albumService.getInfo(id);
+        res.json(info);
     }
 
     public async getAlbums(req: Request, res: Response) {
-        const photographerId = res.locals.tokenInfo.id
-        const albums = await photographerAlbums(photographerId)
-        res.json(albums)
+        const photographerId = res.locals.tokenInfo.id;
+        const albums = await albumService.getAlbums(photographerId);
+        res.json(albums);
     }
 
     public async getPhotos(req: Request, res: Response) {
-        const id = parseInt(req.query.id as string, 10)
-        const photos = await albumPhotos(id)
-        res.json(photos)
+        const id = parseInt(req.query.id as string, 10);
+        if (isNaN(id)) throw new CustomError('Invalid album ID', 400);
+
+        const photos = await albumService.getPhotos(id);
+        res.json(photos);
     }
 
     public async labelAsPaid(req: Request, res: Response) {
-        const albumId = parseInt(req.query.albumId as string, 10)
-        await labelAlbumAsPaid(albumId)
-        res.status(200).send('Album labeled as paid')
+        const albumId = parseInt(req.query.albumId as string, 10);
+        if (isNaN(albumId)) throw new CustomError('Invalid album ID', 400);
+
+        await albumService.labelAsPaid(albumId);
+        res.status(200).send('Album labeled as paid');
     }
 }
 

@@ -11,6 +11,7 @@ import { paymentController } from "../controllers/paymentController";
 const router = Router();
 
 router.post('/photographer/login', errorMiddleware(photographerAuthController.loginPhotographer));
+router.post('/photographer/register', errorMiddleware(photographerAuthController.registerPhotographer));
 
 router.post('/client/getOtp', errorMiddleware(clientAuthController.sendOtp));
 router.get('/client/checkOtp', errorMiddleware(clientAuthController.checkOtp));
